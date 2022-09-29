@@ -89,26 +89,14 @@ rules:
     severity: ERROR
     patterns:
       - pattern: import logging
-
-  # Disallow use of cleaned_data.get('field_name') method.
-  - id: python.custom-credit-group.disallow-cleaned_data.get
-    message: Access cleaned field explicitly using ['field'].
-    languages: [python]
-    severity: ERROR
-    patterns:
-      - pattern-inside: |
-          def $FUNC(...):
-            ...
-      - pattern-either:
-          - pattern: cleaned_data.get(...)
-          - pattern: $PREFIX.cleaned_data.get(...)
-
+      
   # Disallow src prefix in import path.
   - id: python.custom-credit-group.disallow-src-import-prefix
     message: Remove .src from import path.
     languages: [python]
     severity: ERROR
     pattern: import src
+    
 # We can not activate these rules yet
 
 # Disallow callings model save without setting update_fields.
@@ -119,6 +107,20 @@ rules:
 #  patterns:
 #    - pattern: $MODEL.save(...)
 #    - pattern-not: $MODEL.save(..., update_fields=..., ...)
+
+# Disallow use of cleaned_data.get('field_name') method.
+# WHATS NEEDED TO ENABLE: we need to confirm that fields are always available in forms and change QC code
+# - id: python.custom-credit-group.disallow-cleaned_data.get
+#  message: Access cleaned field explicitly using ['field'].
+#  languages: [python]
+#  severity: ERROR
+#  patterns:
+#    - pattern-inside: |
+#        def $FUNC(...):
+#          ...
+#    - pattern-either:
+#        - pattern: cleaned_data.get(...)
+#        - pattern: $PREFIX.cleaned_data.get(...)
 
 # Disallow multiple assignments on one line
 # WHATS NEEDED TO ENABLE: we need to ignore when using update_or_create / get_or_create
