@@ -1,10 +1,14 @@
 rules:
 # Disallow print statements
 - id: python.custom-credit-group.no-prints
-  message: Do not use print statements.
+  message: Do not use print statements in general code. It's only allowed in Django commands
   languages: [python]
   severity: INFO
-  pattern: print(...)
+  patterns:
+    - pattern-not-inside: |
+        class $M(BaseCommand):
+          ...
+    - pattern: print(...)
 
 # Disallow redefining a loop variable inside the loop
 - id: python.custom-credit-group.no-redefinition-inside-loop
@@ -35,23 +39,6 @@ rules:
   severity: ERROR
   patterns:
   - pattern: requests.$METHOD(...)
-
-# Enforce setting `related_name` in Foreign Keys and Many2Many relations
-# TODO: would be awesome to be able to enforce the correct format too!
-- id: python.custom-credit-group.foreign-key-and-many2many-must-set-related-name
-  message: ForeignKey and ManyToMany relationships must explicitly set the "related_name" property as
-    "<model>_<field>_set".
-  languages: [python]
-  severity: ERROR
-  patterns:
-  - pattern-inside: |
-      class $M(...):
-        ...
-  - pattern-either:
-      - pattern: $F = django.db.models.ForeignKey(...)
-      - pattern: $F = django.db.models.ManyToManyField(...)
-  - pattern-not: $F = django.db.models.ForeignKey(..., related_name=..., ...)
-  - pattern-not: $F = django.db.models.ManyToManyField(..., related_name=..., ...)
 
 
 # Replaces python.lang.best-practice.unspecified-open-encoding.unspecified-open-encoding to allow variables instead of only strings in the encoding field
@@ -95,21 +82,6 @@ rules:
     - pattern: rest_framework.fields.CharField(..., choices=..., ...)
     - pattern: rest_framework.serializers.CharField(..., choices=..., ...)
 
-# Disallow multiple assignments on one line
-- id: python.custom-credit-group.disallow-multiple-assignments
-  message: Multiple assignments are not allowed
-  languages: [python]
-  severity: WARNING
-  patterns:
-  - pattern: $A = $B = $C
-  - pattern-not-regex: (.+),(.+)=(.+)
-  - metavariable-regex:
-      metavariable: $A
-      regex: ^[A-Za-z0-9_]+$
-  - metavariable-regex:
-      metavariable: $B
-      regex: ^[A-Za-z0-9_]+$
-
 # Disallow use of logging. Use Django REST logger instead.
 - id: python.custom-credit-group.use-django-rest-logger
   message: Discontinue use of inbuilt logging. Use Django REST Logger instead.
@@ -138,11 +110,47 @@ rules:
   severity: ERROR
   pattern: import src
 
+# We can not activate these rules yet
+
 # Disallow callings model save without setting update_fields.
-- id: python.custom-credit-group.set-update-fields
-  message: Set update fields in model save method. Example object.save(update_fields=['updated_field1', 'updated_field2'])
-  languages: [python]
-  severity: ERROR
-  patterns:
-    - pattern: $MODEL.save(...)
-    - pattern-not: $MODEL.save(..., update_fields=..., ...)
+#- id: python.custom-credit-group.set-update-fields
+#  message: Set update fields in model save method. Example object.save(update_fields=['updated_field1', 'updated_field2'])
+#  languages: [python]
+#  severity: ERROR
+#  patterns:
+#    - pattern: $MODEL.save(...)
+#    - pattern-not: $MODEL.save(..., update_fields=..., ...)
+    
+# Disallow multiple assignments on one line   
+# WHATS NEEDED TO ENABLE: we need to ignore when using update_or_create / get_or_create
+#- id: python.custom-credit-group.disallow-multiple-assignments
+#  message: Multiple assignments are not allowed
+#  languages: [python]
+#  severity: WARNING
+#  patterns:
+#  - pattern: $A = $B = $C
+#  - pattern-not-regex: (.+),(.+)=(.+)
+#  - metavariable-regex:
+#      metavariable: $A
+#      regex: ^[A-Za-z0-9_]+$
+#  - metavariable-regex:
+#      metavariable: $B
+#      regex: ^[A-Za-z0-9_]+$
+
+# Enforce setting `related_name` in Foreign Keys and Many2Many relations
+# WHATS NEEDED TO ENABLE: lots of changes and tests to be done to ensure all code works 
+# TODO: would be awesome to be able to enforce the correct format too!
+#- id: python.custom-credit-group.foreign-key-and-many2many-must-set-related-name
+#  message: ForeignKey and ManyToMany relationships must explicitly set the "related_name" property as
+#    "<model>_<field>_set".
+#  languages: [python]
+#  severity: ERROR
+#  patterns:
+#  - pattern-inside: |
+#      class $M(...):
+#        ...
+#  - pattern-either:
+#      - pattern: $F = django.db.models.ForeignKey(...)
+#      - pattern: $F = django.db.models.ManyToManyField(...)
+#  - pattern-not: $F = django.db.models.ForeignKey(..., related_name=..., ...)
+#  - pattern-not: $F = django.db.models.ManyToManyField(..., related_name=..., ...)
