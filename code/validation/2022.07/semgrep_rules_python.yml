@@ -97,6 +97,43 @@ rules:
     severity: ERROR
     pattern: import src
     
+    
+  # Disallow exc_info=True in log.error
+  - id: python.custom-credit-group.no-exc_info-in-log-error
+    message: Dot not use exc_info in log.error, use log.exception
+    languages: [python]
+    severity: WARNING
+    pattern: django_rest_logger.log.error(...,exc_info=True,...)
+  
+   # Disallow exc_info=True in log.exception
+  - id: python.custom-credit-group.no-exc_info-in-log-exception
+    message: Dot not use exc_info in log.exception
+    languages: [python]
+    severity: WARNING
+    pattern: django_rest_logger.log.exception(...,exc_info=True,...)
+  
+  # Disallow log.error and log.warning in exception block
+  - id: python.custom-credit-group.only-allow-log.exception-in-except
+    message: Dot not use log.error or log.warning in exception block, use log.exception
+    languages: [python]
+    severity: WARNING
+    pattern-either:
+      - pattern: |
+          try:
+            ...
+          except ...:
+            ...
+            django_rest_logger.log.error(...)
+            ...
+      - pattern: |
+          try:
+            ...
+          except ...:
+            ...
+            django_rest_logger.log.warning(...)
+            ...
+            
+            
 # We can not activate these rules yet
 
 # Disallow callings model save without setting update_fields.
