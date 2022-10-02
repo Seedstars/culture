@@ -105,33 +105,25 @@ rules:
     severity: WARNING
     pattern: django_rest_logger.log.error(...,exc_info=True,...)
   
-   # Disallow exc_info=True in log.exception
+   # Disallow exc_info in log.exception, default is True and should be kept
   - id: python.custom-credit-group.no-exc_info-in-log-exception
-    message: Dot not use exc_info in log.exception
+    message: Do not change the value of exc_info in log.exception
     languages: [python]
     severity: WARNING
-    pattern: django_rest_logger.log.exception(...,exc_info=True,...)
+    pattern: django_rest_logger.log.exception(...,exc_info=...,...)
   
-  # Disallow log.error and log.warning in exception block
-  - id: python.custom-credit-group.only-allow-log.exception-in-except
-    message: Dot not use log.error or log.warning in exception block, use log.exception
+  # Disallow log.error in exception block
+  - id: python.custom-credit-group.reject-log-error-in-except
+    message: Dot not use log.error in exception block, use log.exception
     languages: [python]
     severity: WARNING
-    pattern-either:
-      - pattern: |
-          try:
-            ...
-          except ...:
-            ...
-            django_rest_logger.log.error(...)
-            ...
-      - pattern: |
-          try:
-            ...
-          except ...:
-            ...
-            django_rest_logger.log.warning(...)
-            ...
+    pattern: |
+      try:
+        ...
+      except ...:
+        ...
+        django_rest_logger.log.error(...)
+        ...
             
             
 # We can not activate these rules yet
@@ -192,3 +184,4 @@ rules:
 #      - pattern: $F = django.db.models.ManyToManyField(...)
 #  - pattern-not: $F = django.db.models.ForeignKey(..., related_name=..., ...)
 #  - pattern-not: $F = django.db.models.ManyToManyField(..., related_name=..., ...)
+
