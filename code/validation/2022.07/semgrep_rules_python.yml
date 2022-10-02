@@ -97,6 +97,35 @@ rules:
     severity: ERROR
     pattern: import src
     
+    
+  # Disallow exc_info=True in log.error
+  - id: python.custom-credit-group.no-exc_info-in-log-error
+    message: Dot not use exc_info in log.error, use log.exception
+    languages: [python]
+    severity: WARNING
+    pattern: django_rest_logger.log.error(...,exc_info=True,...)
+  
+   # Disallow exc_info in log.exception, default is True and should be kept
+  - id: python.custom-credit-group.no-exc_info-in-log-exception
+    message: Do not change the value of exc_info in log.exception
+    languages: [python]
+    severity: WARNING
+    pattern: django_rest_logger.log.exception(...,exc_info=...,...)
+  
+  # Disallow log.error in exception block
+  - id: python.custom-credit-group.reject-log-error-in-except
+    message: Dot not use log.error in exception block, use log.exception
+    languages: [python]
+    severity: WARNING
+    pattern: |
+      try:
+        ...
+      except ...:
+        ...
+        django_rest_logger.log.error(...)
+        ...
+            
+            
 # We can not activate these rules yet
 
 # Disallow callings model save without setting update_fields.
@@ -155,3 +184,4 @@ rules:
 #      - pattern: $F = django.db.models.ManyToManyField(...)
 #  - pattern-not: $F = django.db.models.ForeignKey(..., related_name=..., ...)
 #  - pattern-not: $F = django.db.models.ManyToManyField(..., related_name=..., ...)
+
