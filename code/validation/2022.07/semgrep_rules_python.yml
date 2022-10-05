@@ -89,29 +89,28 @@ rules:
     severity: ERROR
     patterns:
       - pattern: import logging
-      
+
   # Disallow src prefix in import path.
   - id: python.custom-credit-group.disallow-src-import-prefix
     message: Remove .src from import path.
     languages: [python]
     severity: ERROR
     pattern: import src
-    
-    
+
   # Disallow exc_info=True in log.error
   - id: python.custom-credit-group.no-exc_info-in-log-error
     message: Dot not use exc_info in log.error, use log.exception
     languages: [python]
     severity: WARNING
     pattern: django_rest_logger.log.error(...,exc_info=True,...)
-  
-   # Disallow exc_info in log.exception, default is True and should be kept
+
+    # Disallow exc_info in log.exception, default is True and should be kept
   - id: python.custom-credit-group.no-exc_info-in-log-exception
     message: Do not change the value of exc_info in log.exception
     languages: [python]
     severity: WARNING
     pattern: django_rest_logger.log.exception(...,exc_info=...,...)
-  
+
   # Disallow log.error in exception block
   - id: python.custom-credit-group.reject-log-error-in-except
     message: Dot not use log.error in exception block, use log.exception
@@ -124,8 +123,19 @@ rules:
         ...
         django_rest_logger.log.error(...)
         ...
-            
-            
+  # Disallow use of variables in log messages. Use Django REST logger details instead.
+  - id: python.custom-credit-group.no-variables-in-log-messages
+    message:
+      Do not include variables in log messages. All variables should be moved to
+      log.$METHOD(..., details={...})
+    languages: [python]
+    severity: WARNING
+    patterns:
+      - pattern-either:
+          - pattern: django_rest_logger.log.$METHOD(f"{...}...{...}...{...}")
+          - pattern: django_rest_logger.log.$METHOD("{...}...{...}...{...}")
+          - pattern: django_rest_logger.log.$METHOD(f"{...}...")
+          - pattern: django_rest_logger.log.$METHOD(f"..{...}")
 # We can not activate these rules yet
 
 # Disallow callings model save without setting update_fields.
