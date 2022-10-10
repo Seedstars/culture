@@ -129,13 +129,17 @@ rules:
       Do not include variables in log messages. All variables should be moved to
       log.$METHOD(..., details={...})
     languages: [python]
-    severity: WARNING
     patterns:
       - pattern-either:
-          - pattern: django_rest_logger.log.$METHOD(f"{...}...{...}...{...}")
-          - pattern: django_rest_logger.log.$METHOD("{...}...{...}...{...}")
-          - pattern: django_rest_logger.log.$METHOD(f"{...}...")
-          - pattern: django_rest_logger.log.$METHOD(f"..{...}")
+          - pattern: django_rest_logger.log.$METHOD(..., $X, ...)
+          - pattern: django_rest_logger.log.$METHOD(..., message=$X, ...)
+          - pattern: django_rest_logger.log.$METHOD(..., msg=$X, ...)
+      - metavariable-pattern:
+          metavariable: $X
+          patterns:
+            - pattern-not: |
+                "..."
+    severity: WARNING
 # We can not activate these rules yet
 
 # Disallow callings model save without setting update_fields.
