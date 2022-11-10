@@ -1,0 +1,11 @@
+rules:
+# Disallow redefining a loop variable inside the loop
+- id: python.custom-credit-group.no-redefinition-inside-loop
+  message: Do not redefine loop variables inside the loop.
+  languages: [python]
+  severity: WARNING
+  patterns:
+    - pattern-inside: |
+        for $I in $L:
+            ...
+    - pattern: $I = ...

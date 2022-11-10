@@ -1,0 +1,13 @@
+rules:
+# Disallow charfield with choices
+- id: python.custom-credit-group.disallow-charfield-choices
+  message: CharField should not be used with choices. Use IntegerField instead.
+  languages: [python]
+  severity: WARNING
+  patterns:
+  - pattern-inside: |
+      class $M(...):
+        ...
+  - pattern-either:
+    - pattern: rest_framework.fields.CharField(..., choices=..., ...)
+    - pattern: rest_framework.serializers.CharField(..., choices=..., ...)

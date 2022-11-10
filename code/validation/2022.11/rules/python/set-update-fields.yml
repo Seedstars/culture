@@ -1,0 +1,9 @@
+rules:
+# Disallow callings model save without setting update_fields.
+- id: python.custom-credit-group.set-update-fields
+  message: Set update fields in model save method. Example object.save(update_fields=['updated_field1', 'updated_field2'])
+  languages: [python]
+  severity: ERROR
+  patterns:
+    - pattern: $MODEL.save(...)
+    - pattern-not: $MODEL.save(..., update_fields=..., ...)

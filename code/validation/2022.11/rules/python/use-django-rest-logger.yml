@@ -1,0 +1,8 @@
+rules:
+# Disallow use of logging. Use Django REST logger instead.
+- id: python.custom-credit-group.use-django-rest-logger
+  message: Discontinue use of inbuilt logging. Use Django REST Logger instead.
+  languages: [python]
+  severity: ERROR
+  patterns:
+  - pattern: import logging
