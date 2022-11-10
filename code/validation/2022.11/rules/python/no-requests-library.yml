@@ -1,0 +1,8 @@
+rules:
+# Disallow usage of the `requests` library
+- id: python.custom-credit-group.no-requests-library
+  message: Do not use the `requests` library. Use `RequestClient` instead.
+  languages: [python]
+  severity: ERROR
+  patterns:
+  - pattern: requests.$METHOD(...)

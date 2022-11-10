@@ -1,0 +1,13 @@
+rules:
+# Disallow use of cleaned_data.get('field_name') method.
+- id: python.custom-credit-group.disallow-cleaned_data.get
+  message: Access cleaned field explicitly using ['field'].
+  languages: [python]
+  severity: ERROR
+  patterns:
+  - pattern-inside: |
+      def $FUNC(...):
+        ...
+  - pattern-either:
+    - pattern: cleaned_data.get(...)
+    - pattern: $PREFIX.cleaned_data.get(...)
