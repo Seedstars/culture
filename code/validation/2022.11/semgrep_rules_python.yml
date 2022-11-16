@@ -140,6 +140,17 @@ rules:
             - pattern-not: |
                 "..."
     severity: WARNING
+
+  # Disallow Django's render shortcut because it does not allow logging
+  - id: python.custom-credit-group.do-not-use-render-because-does-not-allow-logging
+    languages:
+      - python
+    message:
+      Do not user the render shortcut since it does not allow logging. You should use our
+      internal util render_with_logging
+    pattern: django.shortcuts.render(...)
+    severity: ERROR
+
 # We can not activate these rules yet
 
 # Disallow callings model save without setting update_fields.
