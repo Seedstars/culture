@@ -1,0 +1,15 @@
+rules:
+# Disallow multiple assignments on one line
+- id: python.custom-credit-group.disallow-multiple-assignments
+  message: Multiple assignments are not allowed
+  languages: [python]
+  severity: WARNING
+  patterns:
+  - pattern: $A = $B = $C
+  - pattern-not-regex: (.+),(.+)=(.+)
+  - metavariable-regex:
+      metavariable: $A
+      regex: ^[A-Za-z0-9_]+$
+  - metavariable-regex:
+      metavariable: $B
+      regex: ^[A-Za-z0-9_]+$
