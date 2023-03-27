@@ -2,10 +2,10 @@
 source = src
 
 omit =
-    *manage.py,
-    *settings/*,
-    *migrations/*,
-    *wsgi.py,
+    *manage.py
+    *settings/*
+    *migrations/*
+    *wsgi.py
     *asgi.py
 
 
