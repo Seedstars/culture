@@ -1,0 +1,205 @@
+rules:
+  # Disallow print statements
+  - id: python.custom-credit-group.no-prints
+    message: Do not use print statements in general code. It's only allowed in Django commands
+    languages: [python]
+    severity: INFO
+    patterns:
+      - pattern-not-inside: |
+          class $M(BaseCommand):
+            ...
+      - pattern: print(...)
+
+  # Disallow redefining a loop variable inside the loop
+  - id: python.custom-credit-group.no-redefinition-inside-loop
+    message: Do not redefine loop variables inside the loop.
+    languages: [python]
+    severity: WARNING
+    patterns:
+      - pattern-inside: |
+          for $I in $L:
+              ...
+      - pattern: $I = ...
+
+  # Disallow making changes to an iterable while iterating it
+  - id: python.custom-credit-group.no-iterable-updates-inside-loop
+    message: Do not update/change an iterable while iterating it.
+    languages: [python]
+    severity: ERROR
+    patterns:
+      - pattern-inside: |
+          for $I in $L:
+              ...
+      - pattern: $L[...] = ...
+
+  # Disallow usage of the `requests` library
+  - id: python.custom-credit-group.no-requests-library
+    message: Do not use the `requests` library. Use `RequestClient` instead.
+    languages: [python]
+    severity: ERROR
+    patterns:
+      - pattern: requests.$METHOD(...)
+
+  # Replaces python.lang.best-practice.unspecified-open-encoding.unspecified-open-encoding to allow variables instead of only strings in the encoding field
+  - id: python.custom-credit-group.unspecified-open-encoding
+    message:
+      Missing 'encoding' parameter. 'open()' uses device locale encodings by
+      default, corrupting files with special characters. Specify the encoding to ensure
+      cross-platform support when opening files in text mode (e.g. encoding="utf-8").
+    languages: [python]
+    severity: WARNING
+    patterns:
+      - pattern-inside: open(...)
+      - pattern-not: open(..., encoding=..., ...)
+      - pattern-not: open($F, "...", $B, "...", ...)
+      - pattern-either:
+          - pattern: open($FILE)
+          - patterns:
+              - pattern: open($FILE, ...)
+              - pattern-not: open($FILE, $M, ...)
+              - pattern-not-regex: open\(.*(?:encoding|mode)=.*\)
+          - patterns:
+              - pattern: open($FILE, $MODE, ...)
+              - metavariable-regex:
+                  metavariable: $MODE
+                  regex: (?!.*b.*)
+          - patterns:
+              - pattern: open($FILE, ..., mode=$MODE, ...)
+              - metavariable-regex:
+                  metavariable: $MODE
+                  regex: (?!.*b.*)
+
+  # Disallow charfield with choices
+  - id: python.custom-credit-group.disallow-charfield-choices
+    message: CharField should not be used with choices. Use IntegerField instead.
+    languages: [python]
+    severity: WARNING
+    patterns:
+      - pattern-inside: |
+          class $M(...):
+            ...
+      - pattern-either:
+          - pattern: rest_framework.fields.CharField(..., choices=..., ...)
+          - pattern: rest_framework.serializers.CharField(..., choices=..., ...)
+
+  # Disallow use of logging. Use Django REST logger instead.
+  - id: python.custom-credit-group.use-django-rest-logger
+    message: Discontinue use of inbuilt logging. Use Django REST Logger instead.
+    languages: [python]
+    severity: ERROR
+    patterns:
+      - pattern: import logging
+
+  # Disallow src prefix in import path.
+  - id: python.custom-credit-group.disallow-src-import-prefix
+    message: Remove .src from import path.
+    languages: [python]
+    severity: ERROR
+    pattern: import src
+
+  # Disallow exc_info=True in log.error
+  - id: python.custom-credit-group.no-exc_info-in-log-error
+    message: Dot not use exc_info in log.error, use log.exception
+    languages: [python]
+    severity: WARNING
+    pattern: django_rest_logger.log.error(...,exc_info=True,...)
+
+    # Disallow exc_info in log.exception, default is True and should be kept
+  - id: python.custom-credit-group.no-exc_info-in-log-exception
+    message: Do not change the value of exc_info in log.exception
+    languages: [python]
+    severity: WARNING
+    pattern: django_rest_logger.log.exception(...,exc_info=...,...)
+
+  # Disallow log.error in exception block
+  - id: python.custom-credit-group.reject-log-error-in-except
+    message: Dot not use log.error in exception block, use log.exception
+    languages: [python]
+    severity: WARNING
+    pattern: |
+      try:
+        ...
+      except ...:
+        ...
+        django_rest_logger.log.error(...)
+        ...
+  # Disallow use of variables in log messages. Use Django REST logger details instead.
+    - id: python.custom-credit-group.no-variables-in-log-messages
+    languages:
+    - python
+    message: Do not include variables in log messages. All variables should be moved
+      to log.$METHOD(..., details={...})
+    patterns:
+    - pattern: log.$METHOD(..., details=...)
+    - pattern-not: log.$METHOD(message=..., details=...)
+    - pattern-not: log.$METHOD(msg=..., details=...)
+
+  # Disallow Django's render shortcut because it does not allow logging
+  - id: python.custom-credit-group.do-not-use-render-because-does-not-allow-logging
+    languages:
+      - python
+    message:
+      Do not user the render shortcut since it does not allow logging. You should use our
+      internal util render_with_logging
+    pattern: django.shortcuts.render(...)
+    severity: ERROR
+
+# We can not activate these rules yet
+
+# Disallow callings model save without setting update_fields.
+#- id: python.custom-credit-group.set-update-fields
+#  message: Set update fields in model save method. Example object.save(update_fields=['updated_field1', 'updated_field2'])
+#  languages: [python]
+#  severity: ERROR
+#  patterns:
+#    - pattern: $MODEL.save(...)
+#    - pattern-not: $MODEL.save(..., update_fields=..., ...)
+
+# Disallow use of cleaned_data.get('field_name') method.
+# WHATS NEEDED TO ENABLE: we need to confirm that fields are always available in forms and change QC code
+# - id: python.custom-credit-group.disallow-cleaned_data.get
+#  message: Access cleaned field explicitly using ['field'].
+#  languages: [python]
+#  severity: ERROR
+#  patterns:
+#    - pattern-inside: |
+#        def $FUNC(...):
+#          ...
+#    - pattern-either:
+#        - pattern: cleaned_data.get(...)
+#        - pattern: $PREFIX.cleaned_data.get(...)
+
+# Disallow multiple assignments on one line
+# WHATS NEEDED TO ENABLE: we need to ignore when using update_or_create / get_or_create
+#- id: python.custom-credit-group.disallow-multiple-assignments
+#  message: Multiple assignments are not allowed
+#  languages: [python]
+#  severity: WARNING
+#  patterns:
+#  - pattern: $A = $B = $C
+#  - pattern-not-regex: (.+),(.+)=(.+)
+#  - metavariable-regex:
+#      metavariable: $A
+#      regex: ^[A-Za-z0-9_]+$
+#  - metavariable-regex:
+#      metavariable: $B
+#      regex: ^[A-Za-z0-9_]+$
+
+# Enforce setting `related_name` in Foreign Keys and Many2Many relations
+# WHATS NEEDED TO ENABLE: lots of changes and tests to be done to ensure all code works
+# TODO: would be awesome to be able to enforce the correct format too!
+#- id: python.custom-credit-group.foreign-key-and-many2many-must-set-related-name
+#  message: ForeignKey and ManyToMany relationships must explicitly set the "related_name" property as
+#    "<model>_<field>_set".
+#  languages: [python]
+#  severity: ERROR
+#  patterns:
+#  - pattern-inside: |
+#      class $M(...):
+#        ...
+#  - pattern-either:
+#      - pattern: $F = django.db.models.ForeignKey(...)
+#      - pattern: $F = django.db.models.ManyToManyField(...)
+#  - pattern-not: $F = django.db.models.ForeignKey(..., related_name=..., ...)
+#  - pattern-not: $F = django.db.models.ManyToManyField(..., related_name=..., ...)
+
