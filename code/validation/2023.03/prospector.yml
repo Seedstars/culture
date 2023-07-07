@@ -20,6 +20,7 @@ pylint:
     - R0201  # disable no-self-use
 
   options:
+    ignore-paths: .*/migrations
     max-locals: 25
     max-returns: 6
     max-branches: 20
