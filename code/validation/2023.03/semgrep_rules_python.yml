@@ -151,6 +151,157 @@ rules:
     pattern: django.shortcuts.render(...)
     severity: ERROR
 
+# ################################################################################################
+# Rules we copied into our system since we needed to extend them to work in our code
+
+  # Force encoding field (change: allow a variable)
+  - id: python.custom-credit-group.copied.unspecified-open-encoding
+    patterns:
+      - pattern-inside: open(...)
+      - pattern-not: open(..., encoding="...", ...)
+      - pattern-not: open(..., encoding=..., ...)
+      - pattern-not: open($F, "...", $B, "...", ...)
+      - pattern-either:
+          - pattern: open($FILE)
+          - patterns:
+              - pattern: open($FILE, ...)
+              - pattern-not: open($FILE, $M, ...)
+              - pattern-not-regex: open\(.*(?:encoding|mode)=.*\)
+          - patterns:
+              - pattern: open($FILE, $MODE, ...)
+              - metavariable-regex:
+                  metavariable: $MODE
+                  regex: (?!.*b.*)
+          - patterns:
+              - pattern: open($FILE, ..., mode=$MODE, ...)
+              - metavariable-regex:
+                  metavariable: $MODE
+                  regex: (?!.*b.*)
+    message: Missing 'encoding' parameter. 'open()' uses device locale encodings by
+      default, corrupting files with special characters. Specify the encoding to
+      ensure cross-platform support when opening files in text mode (e.g.
+      encoding="utf-8").
+    languages:
+      - python
+    severity: WARNING
+    metadata:
+      category: best-practice
+      technology:
+        - python
+      references:
+        - https://www.python.org/dev/peps/pep-0597/
+        - https://docs.python.org/3/library/functions.html#open
+      license: Commons Clause License Condition v1.0[LGPL-2.1-only]
+
+  # Don't allow to access .id (change: support for self.user_id)
+  - id: python.custom-credit-group.copied.access-foreign-keys
+    patterns:
+      - pattern-either:
+          - pattern-inside: |
+              from django.$Y import $Z
+              ...
+          - pattern-inside: |
+              import django
+              ...
+      - pattern: $X.user.id
+      - pattern-not: request.user.id
+      - pattern-not: self.user.id
+    message: You should use ITEM.user_id rather than ITEM.user.id to prevent running
+      an extra query.
+    languages:
+      - python
+    severity: WARNING
+    metadata:
+      category: performance
+      technology:
+        - django
+      license: Commons Clause License Condition v1.0[LGPL-2.1-only]
+ # For validate_password (change: ignore in tests) 
+ - fix: |
+    if django.contrib.auth.password_validation.validate_password($X, user=$MODEL):
+            $MODEL.set_password($X)
+  id: python.django.security.audit.unvalidated-password.unvalidated-password
+  languages:
+  - python
+  message: The password on '$MODEL' is being set without validating the password.
+    Call django.contrib.auth.password_validation.validate_password() with validation
+    functions before setting the password. See https://docs.djangoproject.com/en/3.0/topics/auth/passwords/
+    for more information.
+  metadata:
+    category: security
+    confidence: LOW
+    cwe:
+    - 'CWE-521: Weak Password Requirements'
+    impact: MEDIUM
+    license: Commons Clause License Condition v1.0[LGPL-2.1-only]
+    likelihood: LOW
+    owasp:
+    - A07:2021 - Identification and Authentication Failures
+    references:
+    - https://docs.djangoproject.com/en/3.0/topics/auth/passwords/#module-django.contrib.auth.password_validation
+    semgrep.dev:
+      rule:
+        origin: community
+        rule_id: L1UywG
+        url: https://semgrep.dev/playground/r/pZTQKg/python.django.security.audit.unvalidated-password.unvalidated-password
+        version_id: pZTQKg
+    shortlink: https://sg.run/OPBL
+    source: https://semgrep.dev/r/python.django.security.audit.unvalidated-password.unvalidated-password
+    subcategory:
+    - audit
+    technology:
+    - django
+  patterns:
+  # START all possible test blocks
+  - pattern-not-inside: |
+     class $M(TestCase):
+          ...
+  - pattern-not-inside: |
+     class $M(WebTest):
+          ...	  
+  - pattern-not-inside: |
+     class $M(APITestCase):
+          ...	  
+  - pattern-not-inside: |
+     class $M(WebCustomTestCase):
+          ...	  
+  - pattern-not-inside: |
+     class $M(DjangoModelFactory):
+          ...
+  - pattern-not-inside: |
+     class $M(CustomTestCase):
+          ...
+  - pattern-not-inside: |
+     class $M(FormCustomTestCase):
+          ...
+  # END all possible test blocks
+  - pattern-not-inside: |
+      if <... django.contrib.auth.password_validation.validate_password(...) ...>:
+          ...
+  - pattern-not-inside: |
+      django.contrib.auth.password_validation.validate_password(...)
+      ...
+  - pattern-not-inside: |
+      try:
+        ...
+        django.contrib.auth.password_validation.validate_password(...)
+        ...
+      except $EX:
+        ...
+      ...
+  - pattern-not-inside: |
+      try:
+        ...
+        django.contrib.auth.password_validation.validate_password(...)
+        ...
+      except $EX as $E:
+        ...
+      ...
+  - pattern-not: UserModel().set_password($X)
+  - pattern: $MODEL.set_password($X)
+  severity: WARNING
+
+
 # We can not activate these rules yet
 
 # Disallow callings model save without setting update_fields.
