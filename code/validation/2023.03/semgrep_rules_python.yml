@@ -359,4 +359,3 @@ rules:
 #  - pattern-not: $F = django.db.models.ForeignKey(..., related_name=..., ...)
 #  - pattern-not: $F = django.db.models.ManyToManyField(..., related_name=..., ...)
 
-
