@@ -216,87 +216,88 @@ rules:
       technology:
         - django
       license: Commons Clause License Condition v1.0[LGPL-2.1-only]
- # For validate_password (change: ignore in tests) 
- - id: python.custom-credit-group.copied.python.django.security.audit.unvalidated-password.unvalidated-password
-  languages:
-  - python
-  message: The password on '$MODEL' is being set without validating the password.
-    Call django.contrib.auth.password_validation.validate_password() with validation
-    functions before setting the password. See https://docs.djangoproject.com/en/3.0/topics/auth/passwords/
-    for more information.
-  metadata:
-    category: security
-    confidence: LOW
-    cwe:
-    - 'CWE-521: Weak Password Requirements'
-    impact: MEDIUM
-    license: Commons Clause License Condition v1.0[LGPL-2.1-only]
-    likelihood: LOW
-    owasp:
-    - A07:2021 - Identification and Authentication Failures
-    references:
-    - https://docs.djangoproject.com/en/3.0/topics/auth/passwords/#module-django.contrib.auth.password_validation
-    semgrep.dev:
-      rule:
-        origin: community
-        rule_id: L1UywG
-        url: https://semgrep.dev/playground/r/pZTQKg/python.django.security.audit.unvalidated-password.unvalidated-password
-        version_id: pZTQKg
-    shortlink: https://sg.run/OPBL
-    source: https://semgrep.dev/r/python.django.security.audit.unvalidated-password.unvalidated-password
-    subcategory:
-    - audit
-    technology:
-    - django
-  patterns:
-  # START all possible test blocks
-  - pattern-not-inside: |
-     class $M(TestCase):
-          ...
-  - pattern-not-inside: |
-     class $M(WebTest):
-          ...	  
-  - pattern-not-inside: |
-     class $M(APITestCase):
-          ...	  
-  - pattern-not-inside: |
-     class $M(WebCustomTestCase):
-          ...	  
-  - pattern-not-inside: |
-     class $M(DjangoModelFactory):
-          ...
-  - pattern-not-inside: |
-     class $M(CustomTestCase):
-          ...
-  - pattern-not-inside: |
-     class $M(FormCustomTestCase):
-          ...
-  # END all possible test blocks
-  - pattern-not-inside: |
-      if <... django.contrib.auth.password_validation.validate_password(...) ...>:
-          ...
-  - pattern-not-inside: |
-      django.contrib.auth.password_validation.validate_password(...)
-      ...
-  - pattern-not-inside: |
-      try:
-        ...
+      
+  # For validate_password (change: ignore in tests) 
+  - id: python.custom-credit-group.copied.python.django.security.audit.unvalidated-password.unvalidated-password
+    languages:
+      - python
+    message: The password on '$MODEL' is being set without validating the password.
+      Call django.contrib.auth.password_validation.validate_password() with validation
+      functions before setting the password. See https://docs.djangoproject.com/en/3.0/topics/auth/passwords/
+      for more information.
+    metadata:
+      category: security
+      confidence: LOW
+      cwe:
+      - 'CWE-521: Weak Password Requirements'
+      impact: MEDIUM
+      license: Commons Clause License Condition v1.0[LGPL-2.1-only]
+      likelihood: LOW
+      owasp:
+      - A07:2021 - Identification and Authentication Failures
+      references:
+      - https://docs.djangoproject.com/en/3.0/topics/auth/passwords/#module-django.contrib.auth.password_validation
+      semgrep.dev:
+        rule:
+          origin: community
+          rule_id: L1UywG
+          url: https://semgrep.dev/playground/r/pZTQKg/python.django.security.audit.unvalidated-password.unvalidated-password
+          version_id: pZTQKg
+      shortlink: https://sg.run/OPBL
+      source: https://semgrep.dev/r/python.django.security.audit.unvalidated-password.unvalidated-password
+      subcategory:
+      - audit
+      technology:
+      - django
+    patterns:
+    # START all possible test blocks
+    - pattern-not-inside: |
+      class $M(TestCase):
+            ...
+    - pattern-not-inside: |
+      class $M(WebTest):
+            ...	  
+    - pattern-not-inside: |
+      class $M(APITestCase):
+            ...	  
+    - pattern-not-inside: |
+      class $M(WebCustomTestCase):
+            ...	  
+    - pattern-not-inside: |
+      class $M(DjangoModelFactory):
+            ...
+    - pattern-not-inside: |
+      class $M(CustomTestCase):
+            ...
+    - pattern-not-inside: |
+      class $M(FormCustomTestCase):
+            ...
+    # END all possible test blocks
+    - pattern-not-inside: |
+        if <... django.contrib.auth.password_validation.validate_password(...) ...>:
+            ...
+    - pattern-not-inside: |
         django.contrib.auth.password_validation.validate_password(...)
         ...
-      except $EX:
+    - pattern-not-inside: |
+        try:
+          ...
+          django.contrib.auth.password_validation.validate_password(...)
+          ...
+        except $EX:
+          ...
         ...
-      ...
-  - pattern-not-inside: |
-      try:
+    - pattern-not-inside: |
+        try:
+          ...
+          django.contrib.auth.password_validation.validate_password(...)
+          ...
+        except $EX as $E:
+          ...
         ...
-        django.contrib.auth.password_validation.validate_password(...)
-        ...
-      except $EX as $E:
-        ...
-      ...
-  - pattern-not: UserModel().set_password($X)
-  - pattern: $MODEL.set_password($X)
-  severity: WARNING
+    - pattern-not: UserModel().set_password($X)
+    - pattern: $MODEL.set_password($X)
+    severity: WARNING
 
 
 # We can not activate these rules yet
