@@ -217,10 +217,7 @@ rules:
         - django
       license: Commons Clause License Condition v1.0[LGPL-2.1-only]
  # For validate_password (change: ignore in tests) 
- - fix: |
-    if django.contrib.auth.password_validation.validate_password($X, user=$MODEL):
-            $MODEL.set_password($X)
-  id: python.custom-credit-group.copied.python.django.security.audit.unvalidated-password.unvalidated-password
+ - id: python.custom-credit-group.copied.python.django.security.audit.unvalidated-password.unvalidated-password
   languages:
   - python
   message: The password on '$MODEL' is being set without validating the password.
