@@ -3,8 +3,9 @@ source = src
 
 omit =
     *manage.py
-    *settings/*
-    *migrations/*
+    */settings/*
+    */migrations/*
+    */clickhouse_migrations/*
     *wsgi.py
     *asgi.py
 
