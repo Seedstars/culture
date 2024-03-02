@@ -1,0 +1,11 @@
+rules:
+# Disallow making changes to an iterable while iterating it
+- id: python.custom-credit-group.no-iterable-updates-inside-loop
+  message: Do not update/change an iterable while iterating it.
+  languages: [python]
+  severity: ERROR
+  patterns:
+    - pattern-inside: |
+        for $I in $L:
+            ...
+    - pattern: $L[...] = ...

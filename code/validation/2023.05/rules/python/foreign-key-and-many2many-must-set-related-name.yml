@@ -1,0 +1,17 @@
+rules:
+# Enforce setting `related_name` in Foreign Keys and Many2Many relations
+# TODO: would be awesome to be able to enforce the correct format too!
+- id: python.custom-credit-group.foreign-key-and-many2many-must-set-related-name
+  message: ForeignKey and ManyToMany relationships must explicitly set the "related_name" property as
+    "<model>_<field>_set".
+  languages: [python]
+  severity: ERROR
+  patterns:
+  - pattern-inside: |
+      class $M(...):
+        ...
+  - pattern-either:
+      - pattern: $F = django.db.models.ForeignKey(...)
+      - pattern: $F = django.db.models.ManyToManyField(...)
+  - pattern-not: $F = django.db.models.ForeignKey(..., related_name=..., ...)
+  - pattern-not: $F = django.db.models.ManyToManyField(..., related_name=..., ...)

@@ -1,0 +1,7 @@
+rules:
+# Disallow print statements
+- id: python.custom-credit-group.no-prints
+  message: Do not use print statements.
+  languages: [python]
+  severity: INFO
+  pattern: print(...)
