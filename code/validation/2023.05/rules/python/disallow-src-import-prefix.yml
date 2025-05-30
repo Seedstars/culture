@@ -1,0 +1,7 @@
+rules:
+# Disallow src prefix in import path.
+- id: python.custom-credit-group.disallow-src-import-prefix
+  message: Remove .src from import path.
+  languages: [python]
+  severity: ERROR
+  pattern: import src
